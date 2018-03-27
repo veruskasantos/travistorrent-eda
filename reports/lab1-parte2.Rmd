@@ -4,6 +4,17 @@ output:
     html_document:
          df_print: paged
 ---
+## Analisando projetos de desenvolvimento de software
+
+[um texto introdutório aqui]
+
+
+## Entendendo os dados
+
+Há diversas variáveis nos dados que iremos usar, disponíveis no https://travistorrent.testroots.org e pré-processadas pelo prof. Nazareno. Nesta análise, iremos utilizar as seguintes variáveis, já extraídas dos dados:
+- team: representa a quantidade total de colaboradores em cada projeto, que varia entre 0 e 211. O valor mínimo e máximo são valores estranhos encontrados no dados e foram analisados. 0 contribuidores em um projeto foi considerado um erro e, portanto, desconsiderado nesta análise. 211 contribuidores em um projeto indica a grande dimensão do mesmo, confirmada pelo nome do projeto: Rails, e é um outlier, pois todos os outros projetos possuem valor inferior a 100. Os valores desta variável estão concentrados entre 10 e 50. 
+- lang: representa a linguagem dominante de cada projeto, com valores "java", "ruby" e "javascript". Dados com lang = "javascript" também foram desconsiderados desta análise, pois, possivelmente são erros, já que não eram objeto de coleta, segundo a descrição de quem os coletou. Os valores "ruby" são a maioria na base de dados.
+- build_success_prop: representa a proporção de builds que deram sucesso, de cada projeto. Os valores desta variável variam entre 0.0 e 1.0, porém a concentração dos valores está entre 0.5 e 1.0.
 
 ## Pré-processamento dos dados
 
@@ -26,6 +37,8 @@ projetos = projetos %>%
     filter(lang != "javascript" | team != 0)
 ```
 
+## Como são os tamanhos de time nos projetos que usam travis em Java e em Ruby nos nossos dados? 
+
 Código para criar um gráfico que exibe o tamanho das equipes dos projetos de cada linguagem e a sua frequência.
 
 ```{r}
@@ -39,15 +52,37 @@ projetos %>%
 
 
 Através do gráfico acima, percebemos que, a maioria dos projetos, em ambas as linguagens, tem equipes entre 3 e 10 participantes e nenhum projeto com 2 desenvolvedores. Confirmamos também, que, nesses dados, há mais projetos na linguagem Ruby do que em Java.
-Perceba que, diferente de Java, há projetos em Ruby com mais de 100 desenvolvedores na equipe. Seria Ruby mais popular do que Java, ou há um enviesamento nos dados analisados?
+Perceba que, diferente de Java, há projetos em Ruby com mais de 100 desenvolvedores na equipe. Seria Ruby realmente mais popular do que Java?
 
+## Ao comparar projetos em Java e em Ruby que tenham ao menos 10 contribuidores no time nos nossos dados, projetos de qual linguagem variam mais na proporção de builds cujo resultado é sucesso?
+
+Filtrando os projetos que têm no mínimo 10 contribuidores
+
+```{r cleanTeam}
+projetos = projetos %>%
+    filter(team >= 10)
+
+```
+
+Existem 244 projetos com ao menos 10 contribuidores. Eles são exibidos abaixo com a sua respectiva proporção de buid de sucesso. A maioria dos projetos, tanto em Java com em Ruby, possuem mais de 50% de build de sucesso, pois, há poucos pontos abaixo de 0.50 no gráfico abaixo.
 
 ```{r}
 projetos %>%
-    #group_by(team, lang) #%>%
-    #summarise(n = n()) %>%
-    ggplot(aes(lang, fill = lang)) +
-    geom_bar(position = "stack") +
-    scale_x_log10()
+    ggplot(aes(x = "um label", 
+               y = build_success_prop, color = lang)) + 
+    geom_jitter(alpha = .9, width = .2, size = 2)
 
 ```
+
+Há indícios de que os projetos da linguagem Java possuem uma maior variação, devido a distribuição espalhada no gráfico; os projetos em Ruby estão mais concentrados.
+O gráfico abaixo facilita a visualização e confirma a hipótese de que os projetos Java possuem maior variação na proporção do build de sucesso, pois há projetos com todos os valores de proporção. Os projetos Ruby possuem a proporção de build de de sucesso concentrada entre 50% e 100%.
+
+```{r}
+projetos %>% 
+    ggplot(aes(x= build_success_prop)) + 
+    geom_histogram(bins = 10) + 
+    facet_grid(lang ~ .)
+
+```
+
+
