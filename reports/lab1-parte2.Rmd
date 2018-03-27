@@ -1,0 +1,53 @@
+---
+title: "lab1-parte2"
+output: 
+    html_document:
+         df_print: paged
+---
+
+## Pré-processamento dos dados
+
+Bibliotecas do R a serem usadas no projeto
+
+```{r setup}
+library(tidyverse)
+```
+
+Lendo os dados, já processados, que serão analisados
+
+```{r read}
+projetos = read.csv(here::here("data/projetos.csv"))
+```
+
+Abaixo, removemos projetos que não queremos analisar, por exemplo, aqueles cuja linguagem dominante é Javascript. Também removemos projetos com equipe de tamanho 0, que totalizaram um projeto na base de dados, caracterizado como um registro inconsistente ao analisar outros atributos como o período de atividade e total de commits por mês.
+
+```{r clean}
+projetos = projetos %>%
+    filter(lang != "javascript" | team != 0)
+```
+
+Código para criar um gráfico que exibe o tamanho das equipes dos projetos de cada linguagem e a sua frequência.
+
+```{r}
+projetos %>% 
+    ggplot(aes(x = team)) + 
+    geom_histogram(bins = 20, fill = "blue", color = "blue") + 
+    facet_grid(lang ~ .) +
+    scale_x_log10()
+
+```
+
+
+Através do gráfico acima, percebemos que, a maioria dos projetos, em ambas as linguagens, tem equipes entre 3 e 10 participantes e nenhum projeto com 2 desenvolvedores. Confirmamos também, que, nesses dados, há mais projetos na linguagem Ruby do que em Java.
+Perceba que, diferente de Java, há projetos em Ruby com mais de 100 desenvolvedores na equipe. Seria Ruby mais popular do que Java, ou há um enviesamento nos dados analisados?
+
+
+```{r}
+projetos %>%
+    #group_by(team, lang) #%>%
+    #summarise(n = n()) %>%
+    ggplot(aes(lang, fill = lang)) +
+    geom_bar(position = "stack") +
+    scale_x_log10()
+
+```
