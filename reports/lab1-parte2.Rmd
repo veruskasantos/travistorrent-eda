@@ -1,5 +1,6 @@
 ---
 title: "Analisando projetos de desenvolvimento de software"
+subtitle: "Veruska Borges Santos - FPCC2, UFCG"
 output: 
     html_document:
          df_print: paged
@@ -65,7 +66,7 @@ projetos = projetos %>%
 
 ```
 
-Existem 244 projetos com ao menos 10 contribuidores. Eles são exibidos abaixo (pontos) com a sua respectiva proporção de buid de sucesso (eixo y). A maioria dos projetos, tanto em Java com em Ruby, possuem mais de 50% de build de sucesso, pois, há poucos pontos abaixo de 0.50 no gráfico abaixo.
+Existem 244 projetos com ao menos 10 contribuidores. Eles são exibidos abaixo (pontos) com a sua respectiva proporção de buid de sucesso (eixo y). A maioria dos projetos, tanto em Java como em Ruby, possuem mais de 50% de build de sucesso, pois, há poucos pontos abaixo de 0.50 no gráfico abaixo.
 
 ```{r}
 projetos %>%
