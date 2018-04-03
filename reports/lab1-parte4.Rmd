@@ -36,19 +36,66 @@ projetos = projetos %>%
 Em uma equipe de desenvolvimento, o ideal e esperado é que todos os colaboradores contribuam de forma similar com o projeto. Se uma equipe possui mais colaboradores há indícios de que o projeto seja mais complexo. Assim, espera-se que, quanto mais colaboradores de um projeto, maior seja a atividade do mesmo.
 Atividade aqui estamos representando como o total de commits e o total de buids.
 
-##TODO: COLOCAR TODOS OS PONTOS DENTRO?
 ```{r graph1QP1}
 projetos %>% 
-    ggplot(aes(x= team, y=num_commits)) + 
-    stat_ecdf() +
+    ggplot(aes(x= team, y=num_commits, fill = lang)) + 
+    geom_point() +
+    geom_smooth() +
     scale_x_log10() +
-    scale_y_log10()
+    scale_y_log10() +
+    ggtitle("Relação entre os colaboradores e o total de commits dos projetos") +
+    xlab("Colaboradores") + 
+    ylab("Commits")
 ```
 
 ```{r graph2QP1}
 projetos %>% 
     ggplot(aes(x= team, y=total_builds)) + 
-    stat_ecdf() +
+    geom_point() +
+    geom_smooth() +
     scale_x_log10() +
-    scale_y_log10()
+    scale_y_log10() +
+    ggtitle("Relação entre os colaboradores e o total de builds dos projetos") +
+    xlab("Colaboradores") + 
+    ylab("Builds")
+```
+
+
+##QP2: Projetos longos, com mais de 2 anos de atividade, são projetos grandes?
+
+Para responder a QP2 é necessário descartar os projetos que possuem menos de 24 meses de atividade, considerados como projetos curtos.
+
+```{r filter}
+projetos = projetos %>% 
+    filter(activity_period >= 24)
+```
+##TODO: MELHORAR
+```{r graph1QP2}
+projetos %>% 
+    ggplot(aes(x = activity_period, y=sloc_end)) + 
+    #geom_boxplot() +
+    geom_point() +
+    geom_smooth() +
+    #scale_x_log10() +
+    scale_y_log10() +
+    ggtitle("Relação entre o período de atividade e o tamanho do código") +
+    xlab("Meses") + 
+    ylab("Tamanho do código")
+```
+```{r filter}
+projetos = projetos %>% 
+    filter(activity_period > 6)
+```
+
+```{r graph1QP2}
+projetos %>% 
+    ggplot(aes(x= activity_period, y=team)) + 
+    geom_boxplot() +
+    scale_x_log10() +
+    scale_y_log10() +
+    #geom_point() +
+    #geom_smooth() +
+    ggtitle("Relação entre os colaboradores e o total de builds dos projetos") +
+    xlab("Meses") + 
+    ylab("Colaboradores")
 ```
