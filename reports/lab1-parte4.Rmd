@@ -1,0 +1,54 @@
+---
+title: "Influência da quantidade de colaboradores no desenvolvimento de software"
+author: "Veruska Santos"
+date: "2 de abril de 2018"
+output: html_document
+---
+
+No processo de desenvolvimento de um software é muito comum que as equipes possuam 2 ou mais colaboradores, para diminuir o tempo de produção e otimizar a troca de experiências.
+Com o objetivo de identificar possíveis relações entre os colaboradores e o processo de desenvolvimento de software, este relatório visa analisar, utilizando a linguagem R, um conjunto de projetos de desenvolvimento de software, disponíveis em https://travistorrent.testroots.org, e já pré-processadas pelo prof. Nazareno
+
+## Entendendo os dados
+
+Em desenvolvimento de software é comum utilizar sistemas de controle de versão (SCV), para que as equipes tenham acesso ao mesmo código atualizado. Assim, cada colaborador, ao fazer modificações no código, envia-as para a equipe através do envio de um commit para o SCV. Alguns SCV são integrados com outros sistemas que, a cada, commit, ou seja, modificação no código do SCV, compila esse código e executa os seus testes, para verificar se a integridade do mesmo está mantida. A este processo dá-se o nome de build 
+
+Nesta análise, iremos utilizar apenas as seguintes variáveis, já extraídas dos dados:
+
+
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+
+```{r read, message=FALSE, warning=FALSE}
+projetos = read_csv(here::here("data/projetos.csv"))
+
+```
+
+```{r clean}
+projetos = projetos %>% 
+    filter(lang != "javascript")
+```
+
+## QP1: Há relação entre a quantidade de colaboradores, de cada linguagem, e o número total de commits e o total de builds?
+
+Em uma equipe de desenvolvimento, o ideal e esperado é que todos os colaboradores contribuam de forma similar com o projeto. Se uma equipe possui mais colaboradores há indícios de que o projeto seja mais complexo. Assim, espera-se que, quanto mais colaboradores de um projeto, maior seja a atividade do mesmo.
+Atividade aqui estamos representando como o total de commits e o total de buids.
+
+##TODO: COLOCAR TODOS OS PONTOS DENTRO?
+```{r graph1QP1}
+projetos %>% 
+    ggplot(aes(x= team, y=num_commits)) + 
+    stat_ecdf() +
+    scale_x_log10() +
+    scale_y_log10()
+```
+
+```{r graph2QP1}
+projetos %>% 
+    ggplot(aes(x= team, y=total_builds)) + 
+    stat_ecdf() +
+    scale_x_log10() +
+    scale_y_log10()
+```
