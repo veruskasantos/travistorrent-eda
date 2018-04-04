@@ -5,7 +5,7 @@ date: "2 de abril de 2018"
 output: html_document
 ---
 
-##TODO: descrever variáveis, responder QP4 e revisar
+##TODO: descrever concentração variáveis, responder QP4 e revisar
 
 No processo de desenvolvimento de um software é muito comum que as equipes possuam 2 ou mais colaboradores, para diminuir o tempo de produção e otimizar a troca de experiências.
 Com o objetivo de identificar possíveis relações entre os colaboradores e o processo de desenvolvimento de software, este relatório visa analisar, utilizando a linguagem R, um conjunto de projetos de desenvolvimento de software, disponíveis em https://travistorrent.testroots.org, e já pré-processadas pelo prof. Nazareno
@@ -17,11 +17,19 @@ Em desenvolvimento de software é comum utilizar sistemas de controle de versão
 Nesta análise, iremos utilizar apenas as seguintes variáveis, já extraídas dos dados:
 
 * **team:** representa a quantidade total de colaboradores em cada projeto, que varia entre 0 e 211. O valor mínimo e máximo são valores estranhos encontrados no dados e foram analisados. 0 contribuidores em um projeto foi considerado um erro e, portanto, desconsiderado nesta análise. 211 contribuidores em um projeto indica a grande dimensão do mesmo, confirmada pelo nome do projeto: Rails, e é um outlier, pois todos os outros projetos possuem valor inferior a 100. Ainda assim, os valores desta variável estão concentrados entre 10 e 50.
-* **num_commits:**
-* **total_builds:**
-* **activity_period:**
-* **sloc_end:**
+* **num_commits:** representa o total de commits realizados pela equipe. Seu valor varia entre 1 e 563572.
+* **total_builds:** representa o total de builds realizadas pela equipe. Seu valor varia entre 2 e 341786.
+* **activity_period:** representa a idade do projeto, ou seja, o total de meses que o projeto está ativo. Seu valor varia entre 1 e 74. 
+* **sloc_end:** representa o total de linhas de código  de cada projeto. Seu valor varia entre 11 e 1379466.
 * **build_success_prop:** representa a proporção de builds que deram sucesso, de cada projeto. Os valores desta variável variam entre 0.0 e 1.0, porém a concentração dos valores está entre 0.5 e 1.0.
+
+```{r}
+projetos %>% 
+    ggplot(aes(x = "um label", 
+               y = num_commits)) + 
+    geom_jitter(alpha = .4, width = .2, size = .8) +
+    scale_y_log10()
+```
 
 ## Pré-processamento dos dados
 
@@ -119,6 +127,7 @@ projetos %>%
 O Gráfico 4 nos mostra que existe uma fraca relação crescente entre as variáveis analisadas, ou seja, quanto maior a quantidade de colaboradores em um projeto maior tende a ser, geralmente, o tamanho do código.
 
 ## QP4: Há relação entre o tamanho da equipe e a proporção de build de sucesso?
+Após a análise da QP1, também surgiu a hipótese de que pode haver relação entre o tamanho da equipe e a proporção de build de sucesso, já que, em geral, as equipes maiores trabalham mais. Assim, geramos o gráfico abaixo.
 
 ```{r graph1QP4, message=FALSE, warning=FALSE}
 projetos %>% 
@@ -130,6 +139,50 @@ projetos %>%
     ylab("Proporção de builds de sucesso")
 ```
 
+O gráfico 5 nos mostra que não há relação entre a quantidade de colaboradores e a proporção de builds de sucesso. Todos os projetos analisados possuem valores variados de proporção de build, independente da quantidade de colaboradores.
 
+## Confirmando os resultados
 
+As análises acima nos possibilitaram ver os dados garficamente e identificar possíveis padrões entre as variáveis. Quando há relação entre as variáveis é fácil identificar padrões, como é o exemplo da QP1, porém, quando as variáveis não são relacionadas é mais difícil concluir.
+Para confirmar os dados, analisamos estatisticamente a relação entre as variáveis através da medidas de correlação e exibimos os valores abaixo.
+
+Gráfico 1:
+```{r}
+projetos %>% 
+  summarise(pearson = cor(team, num_commits, method = "pearson"), 
+            spearman = cor(team, num_commits, method = "spearman"),
+            kendall = cor(team, num_commits, method = "kendall"))
+```
+
+Gráfico 2:
+```{r}
+projetos %>% 
+  summarise(pearson = cor(team, total_builds, method = "pearson"), 
+            spearman = cor(team, total_builds, method = "spearman"),
+            kendall = cor(team, total_builds, method = "kendall"))
+```
+
+Gráfico 3:
+```{r}
+projetos %>% 
+  summarise(pearson = cor(activity_period, sloc_end, method = "pearson"), 
+            spearman = cor(activity_period, sloc_end, method = "spearman"),
+            kendall = cor(activity_period, sloc_end, method = "kendall"))
+```
+
+Gráfico 4:
+```{r}
+projetos %>% 
+  summarise(pearson = cor(team, sloc_end, method = "pearson"), 
+            spearman = cor(team, sloc_end, method = "spearman"),
+            kendall = cor(team, sloc_end, method = "kendall"))
+```
+
+Gráfico 5:
+```{r}
+projetos %>% 
+  summarise(pearson = cor(team, build_success_prop, method = "pearson"), 
+            spearman = cor(team, build_success_prop, method = "spearman"),
+            kendall = cor(team, build_success_prop, method = "kendall"))
+```
 
