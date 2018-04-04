@@ -5,97 +5,131 @@ date: "2 de abril de 2018"
 output: html_document
 ---
 
+##TODO: descrever variáveis, responder QP4 e revisar
+
 No processo de desenvolvimento de um software é muito comum que as equipes possuam 2 ou mais colaboradores, para diminuir o tempo de produção e otimizar a troca de experiências.
 Com o objetivo de identificar possíveis relações entre os colaboradores e o processo de desenvolvimento de software, este relatório visa analisar, utilizando a linguagem R, um conjunto de projetos de desenvolvimento de software, disponíveis em https://travistorrent.testroots.org, e já pré-processadas pelo prof. Nazareno
 
-## Entendendo os dados
+Em desenvolvimento de software é comum utilizar sistemas de controle de versão (SCV), para que as equipes tenham acesso ao mesmo código atualizado. Assim, cada colaborador, ao fazer modificações no código, envia-as para a equipe através do envio de um commit para o SCV. Alguns SCV são integrados com outros sistemas que, a cada, commit, ou seja, modificação no código do SCV, compila esse código e executa os seus testes, para verificar se a integridade do mesmo está mantida. A este processo dá-se o nome de build.
 
-Em desenvolvimento de software é comum utilizar sistemas de controle de versão (SCV), para que as equipes tenham acesso ao mesmo código atualizado. Assim, cada colaborador, ao fazer modificações no código, envia-as para a equipe através do envio de um commit para o SCV. Alguns SCV são integrados com outros sistemas que, a cada, commit, ou seja, modificação no código do SCV, compila esse código e executa os seus testes, para verificar se a integridade do mesmo está mantida. A este processo dá-se o nome de build 
+## Entendendo os dados
 
 Nesta análise, iremos utilizar apenas as seguintes variáveis, já extraídas dos dados:
 
+* **team:** representa a quantidade total de colaboradores em cada projeto, que varia entre 0 e 211. O valor mínimo e máximo são valores estranhos encontrados no dados e foram analisados. 0 contribuidores em um projeto foi considerado um erro e, portanto, desconsiderado nesta análise. 211 contribuidores em um projeto indica a grande dimensão do mesmo, confirmada pelo nome do projeto: Rails, e é um outlier, pois todos os outros projetos possuem valor inferior a 100. Ainda assim, os valores desta variável estão concentrados entre 10 e 50.
+* **num_commits:**
+* **total_builds:**
+* **activity_period:**
+* **sloc_end:**
+* **build_success_prop:** representa a proporção de builds que deram sucesso, de cada projeto. Os valores desta variável variam entre 0.0 e 1.0, porém a concentração dos valores está entre 0.5 e 1.0.
 
+## Pré-processamento dos dados
+
+Importando biblioteca do R a ser usada para ler os dados e manipulá-los.
 
 ```{r setup, message=FALSE, warning=FALSE}
 library(tidyverse)
 ```
 
+Carregando os dados, já processados, que serão analisados.
 
 ```{r read, message=FALSE, warning=FALSE}
 projetos = read_csv(here::here("data/projetos.csv"))
 
 ```
 
+Abaixo, descartamos projetos que não queremos analisar, por exemplo, aqueles cuja linguagem dominante é Javascript, somando 4.
+
 ```{r clean}
 projetos = projetos %>% 
     filter(lang != "javascript")
 ```
 
-## QP1: Há relação entre a quantidade de colaboradores, de cada linguagem, e o número total de commits e o total de builds?
+Para estudar algumas relações entre variáveis, criamos 4 Questões de Pesquisa (QP) para respondermos através de análises gráficas.
+
+## QP1: Há relação entre a quantidade de colaboradores dos projetos e o número total de commits e o total de builds?
 
 Em uma equipe de desenvolvimento, o ideal e esperado é que todos os colaboradores contribuam de forma similar com o projeto. Se uma equipe possui mais colaboradores há indícios de que o projeto seja mais complexo. Assim, espera-se que, quanto mais colaboradores de um projeto, maior seja a atividade do mesmo.
 Atividade aqui estamos representando como o total de commits e o total de buids.
 
-```{r graph1QP1}
+O gráfico abaixo exibe a relação entre a quantidade de colaboradores de uma equipe e o total de commits realizado pelos mesmos.
+
+```{r graph1QP1, message=FALSE, warning=FALSE}
 projetos %>% 
-    ggplot(aes(x= team, y=num_commits, fill = lang)) + 
-    geom_point() +
-    geom_smooth() +
+    ggplot(aes(x= team, y=num_commits)) + 
+    geom_point(color="#44b8ee") +
+    geom_smooth(method = "lm", se=F) +
     scale_x_log10() +
     scale_y_log10() +
-    ggtitle("Relação entre os colaboradores e o total de commits dos projetos") +
+    ggtitle("Gráfico 1: Relação entre os colaboradores e o total de commits dos projetos") +
     xlab("Colaboradores") + 
     ylab("Commits")
 ```
 
-```{r graph2QP1}
+Os dados mostram que, há uma relação crescente entre as equipes com poucos colaboradores e o número total de commits realizados. Assim, quanto maior uma equipe de desenvolvimento maior tende a ser a atividade do projeto.
+Para as equipes acima de 10 colaboradores não há relação explícita entre o tamanho da equipe e o total de commits.
+
+As mesmas conclusões se aplicam para a relação entre o tamanho da equipe de desenvolvimento e o total de builds do projeto, mostradas no Gráfico 2 abaixo.
+
+```{r graph2QP1, message=FALSE, warning=FALSE}
 projetos %>% 
     ggplot(aes(x= team, y=total_builds)) + 
-    geom_point() +
-    geom_smooth() +
+    geom_point(color="#44b8ee") +
+    geom_smooth(method = "lm", se=F) +
     scale_x_log10() +
     scale_y_log10() +
-    ggtitle("Relação entre os colaboradores e o total de builds dos projetos") +
+    ggtitle("Gráfico 2: Relação entre os colaboradores e o total de builds dos projetos") +
     xlab("Colaboradores") + 
     ylab("Builds")
 ```
 
+Desse modo, para a QP1 concluímos que, apenas nas equipes pequenas, há uma relação crescente entre a quantidadade de colaboradores e o total de commits e de builds do projeto.
 
 ##QP2: Projetos longos, com mais de 2 anos de atividade, são projetos grandes?
 
-Para responder a QP2 é necessário descartar os projetos que possuem menos de 24 meses de atividade, considerados como projetos curtos.
+Projetos de desenvolvimento de software, em geral, são desenvolvidos em poucos meses. Aqueles que levam mais tempo são considerados como mais complexos e, possivelmente, maiores. Para confirmar tal hipótese, geramos o gráfico abaixo que exibe o período de atividade de cada projeto e o seu tamanho do código (total de linhas).
 
-```{r filter}
-projetos = projetos %>% 
-    filter(activity_period >= 24)
-```
-##TODO: MELHORAR
 ```{r graph1QP2}
 projetos %>% 
-    ggplot(aes(x = activity_period, y=sloc_end)) + 
-    #geom_boxplot() +
-    geom_point() +
-    geom_smooth() +
-    #scale_x_log10() +
+    ggplot(aes(x = activity_period, y=sloc_end)) +
+    geom_point(color = "#44b8ee") +
     scale_y_log10() +
-    ggtitle("Relação entre o período de atividade e o tamanho do código") +
-    xlab("Meses") + 
+    ggtitle("Gráfico 3: Relação entre o período de atividade e o tamanho do código") +
+    xlab("Meses de atividade") + 
     ylab("Tamanho do código")
 ```
-```{r filter}
-projetos = projetos %>% 
-    filter(activity_period > 6)
-```
 
-```{r graph1QP2}
+Analisando o Gráfico 3 percebemos que não há qualquer relação entre o período de atividade de um projeto e o tamanho do mesmo, pois os pontos, que representam os projetos, estão espalhados por todo o gráfico. Assim, respondendo a QP2, não podemos afirmar que um projeto longo é necessariamente grande, porque, nos dados, há diversos projetos pequenos com mais de 2 anos de atividade, bem como há projetos grandes com pouco tempo de atividade.
+
+
+## QP3: Há relação entre o tamanho do código e a quantidade de colaboradores?
+Diante da análise sobre a QP1, percebemos que há uma pequena relação entre a quantidade de colaboradores e o aumento na atividade do projeto. Assim, decidimos analisar se também há uma relação crescente entre a quantidade de colaboradores e o tamanho do código.
+
+```{r graph1QP3, message=FALSE, warning=FALSE}
 projetos %>% 
-    ggplot(aes(x= activity_period, y=team)) + 
-    geom_boxplot() +
+    ggplot(aes(x= team, y=sloc_end)) +
     scale_x_log10() +
     scale_y_log10() +
-    #geom_point() +
-    #geom_smooth() +
-    ggtitle("Relação entre os colaboradores e o total de builds dos projetos") +
-    xlab("Meses") + 
-    ylab("Colaboradores")
+    geom_point(color = "#44b8ee") +
+    ggtitle("Gráfico 4: Relação entre os colaboradores e o tamanho total do código") +
+    xlab("Colaboradores") + 
+    ylab("Tamanho do código")
 ```
+
+O Gráfico 4 nos mostra que existe uma fraca relação crescente entre as variáveis analisadas, ou seja, quanto maior a quantidade de colaboradores em um projeto maior tende a ser, geralmente, o tamanho do código.
+
+## QP4: Há relação entre o tamanho da equipe e a proporção de build de sucesso?
+
+```{r graph1QP4, message=FALSE, warning=FALSE}
+projetos %>% 
+    ggplot(aes(x= team, y=build_success_prop)) +
+    scale_x_log10() +
+    geom_point(color = "#44b8ee") +
+    ggtitle("Gráfico 5: Relação entre o total de colaboradores e a proporção de builds de sucesso") +
+    xlab("Colaboradores") + 
+    ylab("Proporção de builds de sucesso")
+```
+
+
+
+
