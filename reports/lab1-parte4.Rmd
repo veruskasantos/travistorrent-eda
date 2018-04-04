@@ -1,35 +1,25 @@
 ---
 title: "Influência da quantidade de colaboradores no desenvolvimento de software"
 author: "Veruska Santos"
-date: "2 de abril de 2018"
+date: "4 de abril de 2018"
 output: html_document
 ---
 
-##TODO: descrever concentração variáveis, responder QP4 e revisar
-
 No processo de desenvolvimento de um software é muito comum que as equipes possuam 2 ou mais colaboradores, para diminuir o tempo de produção e otimizar a troca de experiências.
-Com o objetivo de identificar possíveis relações entre os colaboradores e o processo de desenvolvimento de software, este relatório visa analisar, utilizando a linguagem R, um conjunto de projetos de desenvolvimento de software, disponíveis em https://travistorrent.testroots.org, e já pré-processadas pelo prof. Nazareno
+Com o objetivo de identificar possíveis relações entre os colaboradores e o processo de desenvolvimento de software, este relatório visa analisar, utilizando a linguagem R, um conjunto de projetos de desenvolvimento de software, já pré-processadas pelo prof. Nazareno
 
-Em desenvolvimento de software é comum utilizar sistemas de controle de versão (SCV), para que as equipes tenham acesso ao mesmo código atualizado. Assim, cada colaborador, ao fazer modificações no código, envia-as para a equipe através do envio de um commit para o SCV. Alguns SCV são integrados com outros sistemas que, a cada, commit, ou seja, modificação no código do SCV, compila esse código e executa os seus testes, para verificar se a integridade do mesmo está mantida. A este processo dá-se o nome de build.
+É também comum no desenvolvimento de software utilizar sistemas de controle de versão (SCV), para que as equipes tenham acesso ao mesmo código atualizado. Assim, cada colaborador, ao fazer modificações no código, envia-as para a equipe através do envio de um commit para o SCV. Alguns SCV são integrados com outros sistemas que, a cada, **commit**, ou seja, modificação no código do SCV, compila esse código e executa os seus testes, para verificar se a integridade do mesmo está mantida. A este verificação dá-se o nome de **build**.
 
 ## Entendendo os dados
 
 Nesta análise, iremos utilizar apenas as seguintes variáveis, já extraídas dos dados:
 
-* **team:** representa a quantidade total de colaboradores em cada projeto, que varia entre 0 e 211. O valor mínimo e máximo são valores estranhos encontrados no dados e foram analisados. 0 contribuidores em um projeto foi considerado um erro e, portanto, desconsiderado nesta análise. 211 contribuidores em um projeto indica a grande dimensão do mesmo, confirmada pelo nome do projeto: Rails, e é um outlier, pois todos os outros projetos possuem valor inferior a 100. Ainda assim, os valores desta variável estão concentrados entre 10 e 50.
+* **team:** representa a quantidade total de colaboradores em cada projeto, que varia entre 0 e 211. O valor mínimo e máximo são valores estranhos encontrados no dados e foram analisados. 0 contribuidores pode significar que ninguém atualizou o projeto recentemente. 211 contribuidores em um projeto indica a grande dimensão do mesmo, confirmada pelo nome do projeto: Rails, e é um outlier, pois todos os outros projetos possuem valor inferior a 100. Ainda assim, os valores desta variável estão concentrados entre 10 e 50.
 * **num_commits:** representa o total de commits realizados pela equipe. Seu valor varia entre 1 e 563572.
 * **total_builds:** representa o total de builds realizadas pela equipe. Seu valor varia entre 2 e 341786.
 * **activity_period:** representa a idade do projeto, ou seja, o total de meses que o projeto está ativo. Seu valor varia entre 1 e 74. 
 * **sloc_end:** representa o total de linhas de código  de cada projeto. Seu valor varia entre 11 e 1379466.
 * **build_success_prop:** representa a proporção de builds que deram sucesso, de cada projeto. Os valores desta variável variam entre 0.0 e 1.0, porém a concentração dos valores está entre 0.5 e 1.0.
-
-```{r}
-projetos %>% 
-    ggplot(aes(x = "um label", 
-               y = num_commits)) + 
-    geom_jitter(alpha = .4, width = .2, size = .8) +
-    scale_y_log10()
-```
 
 ## Pré-processamento dos dados
 
@@ -58,15 +48,15 @@ Para estudar algumas relações entre variáveis, criamos 4 Questões de Pesquis
 ## QP1: Há relação entre a quantidade de colaboradores dos projetos e o número total de commits e o total de builds?
 
 Em uma equipe de desenvolvimento, o ideal e esperado é que todos os colaboradores contribuam de forma similar com o projeto. Se uma equipe possui mais colaboradores há indícios de que o projeto seja mais complexo. Assim, espera-se que, quanto mais colaboradores de um projeto, maior seja a atividade do mesmo.
-Atividade aqui estamos representando como o total de commits e o total de buids.
+Atividade aqui estamos representando como o total de commits e o total de builds.
 
 O gráfico abaixo exibe a relação entre a quantidade de colaboradores de uma equipe e o total de commits realizado pelos mesmos.
 
 ```{r graph1QP1, message=FALSE, warning=FALSE}
 projetos %>% 
-    ggplot(aes(x= team, y=num_commits)) + 
-    geom_point(color="#44b8ee") +
-    geom_smooth(method = "lm", se=F) +
+    ggplot(aes(x = team, y = num_commits)) + 
+    geom_point(color = "#44b8ee") +
+    geom_smooth(method = "lm", se = F) +
     scale_x_log10() +
     scale_y_log10() +
     ggtitle("Gráfico 1: Relação entre os colaboradores e o total de commits dos projetos") +
@@ -81,9 +71,9 @@ As mesmas conclusões se aplicam para a relação entre o tamanho da equipe de d
 
 ```{r graph2QP1, message=FALSE, warning=FALSE}
 projetos %>% 
-    ggplot(aes(x= team, y=total_builds)) + 
-    geom_point(color="#44b8ee") +
-    geom_smooth(method = "lm", se=F) +
+    ggplot(aes(x = team, y = total_builds)) + 
+    geom_point(color = "#44b8ee") +
+    geom_smooth(method = "lm", se = F) +
     scale_x_log10() +
     scale_y_log10() +
     ggtitle("Gráfico 2: Relação entre os colaboradores e o total de builds dos projetos") +
@@ -91,7 +81,7 @@ projetos %>%
     ylab("Builds")
 ```
 
-Desse modo, para a QP1 concluímos que, apenas nas equipes pequenas, há uma relação crescente entre a quantidadade de colaboradores e o total de commits e de builds do projeto.
+Desse modo, para a QP1 concluímos que há uma relação crescente moderada entre a quantidadade de colaboradores e o total de commits e de builds do projeto.
 
 ##QP2: Projetos longos, com mais de 2 anos de atividade, são projetos grandes?
 
@@ -99,7 +89,7 @@ Projetos de desenvolvimento de software, em geral, são desenvolvidos em poucos 
 
 ```{r graph1QP2}
 projetos %>% 
-    ggplot(aes(x = activity_period, y=sloc_end)) +
+    ggplot(aes(x = activity_period, y = sloc_end)) +
     geom_point(color = "#44b8ee") +
     scale_y_log10() +
     ggtitle("Gráfico 3: Relação entre o período de atividade e o tamanho do código") +
@@ -111,11 +101,11 @@ Analisando o Gráfico 3 percebemos que não há qualquer relação entre o perí
 
 
 ## QP3: Há relação entre o tamanho do código e a quantidade de colaboradores?
-Diante da análise sobre a QP1, percebemos que há uma pequena relação entre a quantidade de colaboradores e o aumento na atividade do projeto. Assim, decidimos analisar se também há uma relação crescente entre a quantidade de colaboradores e o tamanho do código.
+Diante da análise sobre a QP1, percebemos que existe uma relação entre a quantidade de colaboradores e o aumento na atividade do projeto. Assim, decidimos analisar se também há uma relação crescente entre a quantidade de colaboradores e o tamanho do código.
 
 ```{r graph1QP3, message=FALSE, warning=FALSE}
 projetos %>% 
-    ggplot(aes(x= team, y=sloc_end)) +
+    ggplot(aes(x = team, y = sloc_end)) +
     scale_x_log10() +
     scale_y_log10() +
     geom_point(color = "#44b8ee") +
@@ -126,27 +116,34 @@ projetos %>%
 
 O Gráfico 4 nos mostra que existe uma fraca relação crescente entre as variáveis analisadas, ou seja, quanto maior a quantidade de colaboradores em um projeto maior tende a ser, geralmente, o tamanho do código.
 
-## QP4: Há relação entre o tamanho da equipe e a proporção de build de sucesso?
-Após a análise da QP1, também surgiu a hipótese de que pode haver relação entre o tamanho da equipe e a proporção de build de sucesso, já que, em geral, as equipes maiores trabalham mais. Assim, geramos o gráfico abaixo.
+## QP4: Há relação entre o tamanho da equipe e a proporção de builds de sucesso?
+Após a análise da QP1, também surgiu a hipótese de que pode haver relação entre o tamanho da equipe e a proporção de builds de sucesso, já que, em geral, as equipes maiores trabalham mais. Assim, geramos o gráfico abaixo.
 
 ```{r graph1QP4, message=FALSE, warning=FALSE}
 projetos %>% 
     ggplot(aes(x= team, y=build_success_prop)) +
     scale_x_log10() +
     geom_point(color = "#44b8ee") +
-    ggtitle("Gráfico 5: Relação entre o total de colaboradores e a proporção de builds de sucesso") +
+    ggtitle("Gráfico 5: Relação entre o total de colaboradores e as builds de sucesso") +
     xlab("Colaboradores") + 
     ylab("Proporção de builds de sucesso")
 ```
 
-O gráfico 5 nos mostra que não há relação entre a quantidade de colaboradores e a proporção de builds de sucesso. Todos os projetos analisados possuem valores variados de proporção de build, independente da quantidade de colaboradores.
+O gráfico 5 nos mostra que não existe relação entre a quantidade de colaboradores e a proporção de builds de sucesso. Todos os projetos analisados possuem valores variados de proporção de build, independente da quantidade de colaboradores.
 
 ## Confirmando os resultados
 
-As análises acima nos possibilitaram ver os dados garficamente e identificar possíveis padrões entre as variáveis. Quando há relação entre as variáveis é fácil identificar padrões, como é o exemplo da QP1, porém, quando as variáveis não são relacionadas é mais difícil concluir.
-Para confirmar os dados, analisamos estatisticamente a relação entre as variáveis através da medidas de correlação e exibimos os valores abaixo.
+As análises acima nos possibilitaram ver os dados garficamente e identificar possíveis padrões entre as variáveis. Quando há relação entre as variáveis é fácil identificar tal padrão, como é o exemplo da QP1, porém, quando as variáveis não são relacionadas é mais difícil inferir alguma conclusão.
 
-Gráfico 1:
+Para confirmar os resultados, analisamos estatisticamente a relação entre as variáveis através dos coeficientes de correlação (Pearson, Spearman e Kendal) e exibimos os valores abaixo.
+O valor dos coefientes estão entre [-1,1], o que significa que quanto mais perto dos extremos maior é a relação entre as variáveis, e quanto mais perto de zero, menor ou insignificante é a relação. O sinal indica a direção do relacionamento: decrescente (-) ou crescente (+).
+
+* O coeficiente de Pearson mede o grau do relacionamento entre variáveis linearmente relacionadas.
+* O coeficiente de Spearman é um teste não paramétrico que é usado para medir o grau de associação entre duas variáveis, sem considerar a distribuição dos dados.
+* O coeficiente de Kendal é um teste não paramétrico que mede a força de dependência entre duas variáveis.
+
+
+Para a QP1, Gráfico 1:
 ```{r}
 projetos %>% 
   summarise(pearson = cor(team, num_commits, method = "pearson"), 
@@ -154,7 +151,7 @@ projetos %>%
             kendall = cor(team, num_commits, method = "kendall"))
 ```
 
-Gráfico 2:
+Para a QP1, Gráfico 2:
 ```{r}
 projetos %>% 
   summarise(pearson = cor(team, total_builds, method = "pearson"), 
@@ -162,7 +159,7 @@ projetos %>%
             kendall = cor(team, total_builds, method = "kendall"))
 ```
 
-Gráfico 3:
+Para a QP2, Gráfico 3:
 ```{r}
 projetos %>% 
   summarise(pearson = cor(activity_period, sloc_end, method = "pearson"), 
@@ -170,7 +167,7 @@ projetos %>%
             kendall = cor(activity_period, sloc_end, method = "kendall"))
 ```
 
-Gráfico 4:
+Para a QP3, Gráfico 4:
 ```{r}
 projetos %>% 
   summarise(pearson = cor(team, sloc_end, method = "pearson"), 
@@ -178,7 +175,7 @@ projetos %>%
             kendall = cor(team, sloc_end, method = "kendall"))
 ```
 
-Gráfico 5:
+Para a QP4, Gráfico 5:
 ```{r}
 projetos %>% 
   summarise(pearson = cor(team, build_success_prop, method = "pearson"), 
@@ -186,3 +183,9 @@ projetos %>%
             kendall = cor(team, build_success_prop, method = "kendall"))
 ```
 
+Assim, concluímos que, das variáveis analisadas, somente a quantidade de colaboradores influencia na atividade do projeto, ou seja, em um projeto de desenvolvimento de software, o tamanho da equipe influencia nas atividades do projeto. 
+
+**Links úteis:**
+
+* Dados utilizados nesta análise: https://travistorrent.testroots.org
+* Coeficientes de correlação: https://www.statisticssolutions.com/correlation-pearson-kendall-spearman/
