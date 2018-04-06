@@ -2,7 +2,9 @@
 title: "Influência da quantidade de colaboradores no desenvolvimento de software"
 author: "Veruska Santos"
 date: "4 de abril de 2018"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 No processo de desenvolvimento de um software é muito comum que as equipes possuam 2 ou mais colaboradores, para diminuir o tempo de produção e otimizar a troca de experiências.
@@ -133,7 +135,7 @@ O gráfico 5 nos mostra que não existe relação entre a quantidade de colabora
 
 ## Confirmando os resultados
 
-As análises acima nos possibilitaram ver os dados garficamente e identificar possíveis padrões entre as variáveis. Quando há relação entre as variáveis é fácil identificar tal padrão, como é o exemplo da QP1, porém, quando as variáveis não são relacionadas é mais difícil inferir alguma conclusão.
+As análises acima nos possibilitaram ver os dados graficamente e identificar possíveis padrões entre as variáveis. Quando há relação entre as variáveis é fácil identificar tal padrão, como é o exemplo da QP1, porém, quando as variáveis não são relacionadas é mais difícil inferir alguma conclusão.
 
 Para confirmar os resultados, analisamos estatisticamente a relação entre as variáveis através dos coeficientes de correlação (Pearson, Spearman e Kendal) e exibimos os valores abaixo.
 O valor dos coefientes estão entre [-1,1], o que significa que quanto mais perto dos extremos maior é a relação entre as variáveis, e quanto mais perto de zero, menor ou insignificante é a relação. O sinal indica a direção do relacionamento: decrescente (-) ou crescente (+).
