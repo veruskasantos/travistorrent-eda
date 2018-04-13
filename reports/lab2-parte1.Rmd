@@ -1,0 +1,87 @@
+---
+title: "Analisando a qualidade de projetos de desenvolvimento de software"
+author: "Veruska Santos"
+date: "12 de abril de 2018"
+output: html_document
+---
+
+O desenvolvimento de software é um processo caracterizado pelo planejamento das atividades, desenvolvimento do produto, verificação da qualidade e adaptações. Este é um ciclo que, não necessariamente, obedece esta ordem. Há diversos estudos que analizam este processo, afim de entender relações, otimizar prazos, melhorar estratégias de desenvolvimento e muitas outras coisas.
+Assim, dado um conjunto de projetos de desenvolvimento de software, disponíveis no TravisTrorrent¹, decidimos analisar a relação entre algumas variáveis, com o objetivo de identificar possíveis relações entre a qualidade de código e projetos de diferentes linguagens. Dessa forma, surgiu a seguinte Questão de Pesquisa (QP):
+
+QP: Existe diferença significativa entre a qualidade de código de projetos de diferentes linguagens?
+
+Para responder tal pergunta, utilizamos a linguagem R e o RStudio que facilitam a análise dos dados.
+
+## Entendendo os dados
+
+
+* **team:** 
+* **build_sucess_prop:**
+* **tests_per_kloc:**
+* **test_density:**
+
+## Pré-processamento
+
+Importando biblioteca do R a ser usada para ler os dados e manipulá-los.
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+Carregando os dados, já processados pelo prof. Nazareno, que serão analisados.
+
+```{r read, message=FALSE, warning=FALSE}
+projetos = read_csv(here::here("data/projetos.csv"))
+
+```
+
+Para analisar os dados, excluímos os projetos cuja linguagem principal é Javascript, porque não possui uma quantidade significativa em relação aos projetos Java e Ruby, na amostra disponibilizada.
+
+```{r clean}
+projetos = projetos %>% 
+    filter(lang != "javascript")
+```
+
+## Existe diferença significativa entre a qualidade de código de projetos de diferentes linguagens?
+
+```{r graph1, message=FALSE, warning=FALSE}
+projetos %>% 
+    ggplot(aes(x = tests_per_kloc, y = build_success_prop, color = lang, size = test_density)) + 
+    geom_point() +
+    scale_x_log10() +
+    ggtitle("Gráfico 1: Relação entre os colaboradores e o total de builds dos projetos") +
+    xlab("x") + 
+    ylab("y")
+```
+
+```{r graph2, message=FALSE, warning=FALSE}
+projetos %>% 
+    ggplot(aes(x = test_density, y = tests_per_kloc, color = lang, size = build_success_prop)) + 
+    geom_point() +
+    scale_x_log10() +
+    scale_y_log10() +
+    ggtitle("Gráfico 1: Relação entre os colaboradores e o total de builds dos projetos") +
+    xlab("x") + 
+    ylab("y")
+```
+
+
+## TODO mostrar algo com barras
+
+```{r graph1, message=FALSE, warning=FALSE}
+projetos %>% 
+    ggplot(aes(x = build_success_prop, fill = lang)) + 
+    geom_bar(position = "dodge") +
+    #scale_x_log10() +
+    ggtitle("Gráfico 1: Relação entre os colaboradores e o total de builds dos projetos") +
+    xlab("x") + 
+    ylab("y")
+```
+```{r}
+projetos %>% 
+    ggplot(aes(x = tests_per_kloc, y = build_success_prop, color = lang)) + 
+    stat_ecdf() 
+
+```
+
+
