@@ -44,15 +44,35 @@ projetos = projetos %>%
 
 ## Existe diferença significativa entre a qualidade de código de projetos de diferentes linguagens?
 
+A partir dos dados disponibilizados no travis, gostaríamos de verificar qual a linguagem de programação que apresenta projetos com índices de melhor qualidade de código, como quantidade de testes, densidade e proporção de builds de sucesso. Assim, supõe-se que, pela linguagem Java ser mais popular, a qualidade de projetos desenvolvidos nesta linguagem também seja melhor.
+
+```{r}
+projetos %>% 
+    ggplot(aes(x = lang, y = tests_per_kloc, size = test_density, color = build_success_prop)) + 
+    geom_jitter(width = .3) +
+    scale_y_log10() +
+    ggtitle("Gráfico 1: Distribuição da quantidade de testes por linguagem") +
+    xlab("Linguagem") + 
+    ylab("#Testes por mil linhas de código")
+```
+
+O Gráfico 1, acima, nos mostra que os projetos da linguagem Ruby estão concentrados na parte superior do gráfico, apresentando mais testes, por linha de código, do que os projetos da linguagem Java. Consequentemente, a densidade de testes dos projetos é maior, o que é verificável a partir do tamanho dos círculos no gráfico. Entretanto, é difícil identificar em qual linguagem os projetos possuem a maior proporção de builds de sucesso em relação a outra, porque, em ambas, a maioria dos projetos apresentam os melhores valores (azul mais claro).
+
+Assim, a partir do Gráfico 1, encontramos claramente a resposta da QP, onde os projetos da linguagem Ruby apresentam melhores indícios de qualidade de código.
+
 ```{r graph1, message=FALSE, warning=FALSE}
 projetos %>% 
     ggplot(aes(x = tests_per_kloc, y = build_success_prop, color = lang, size = test_density)) + 
     geom_point() +
     scale_x_log10() +
-    ggtitle("Gráfico 1: Relação entre os colaboradores e o total de builds dos projetos") +
-    xlab("x") + 
-    ylab("y")
+    ggtitle("Gráfico 1: Relação entre a quantidade de testes e a proporção de builds") +
+    xlab("#Testes por mil linhas de código") + 
+    ylab("Proporção de builds de sucesso")
 ```
+
+
+
+
 
 ```{r graph2, message=FALSE, warning=FALSE}
 projetos %>% 
@@ -77,10 +97,17 @@ projetos %>%
     xlab("x") + 
     ylab("y")
 ```
+
+
 ```{r}
 projetos %>% 
-    ggplot(aes(x = tests_per_kloc, y = build_success_prop, color = lang)) + 
-    stat_ecdf() 
+    ggplot() + 
+    stat_ecdf(aes(x = tests_per_kloc, y = build_success_prop, color = lang)) +
+    stat_ecdf(aes(x = test_density, y = build_success_prop, color = lang), linetype = "dashed") +
+    scale_x_log10() +
+    ggtitle("Gráfico 3: Distribuição da quantidade de testes por linguagem") +
+    xlab("#Testes por linha de código") + 
+    ylab("Proporção de builds de sucesso")
 
 ```
 
