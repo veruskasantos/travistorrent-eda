@@ -1,24 +1,25 @@
 ---
 title: "Analisando a qualidade de projetos de desenvolvimento de software"
 author: "Veruska Santos"
-date: "12 de abril de 2018"
+date: "15 de abril de 2018"
 output: html_document
 ---
 
-O desenvolvimento de software é um processo caracterizado pelo planejamento das atividades, desenvolvimento do produto, verificação da qualidade e adaptações. Este é um ciclo que, não necessariamente, obedece esta ordem. Há diversos estudos que analizam este processo, afim de entender relações, otimizar prazos, melhorar estratégias de desenvolvimento e muitas outras coisas.
+O desenvolvimento de software é um processo caracterizado pelo planejamento das atividades, desenvolvimento do produto, verificação da qualidade e adaptações. Este é um ciclo que, não necessariamente, obedece esta ordem. Há diversos estudos que analizam este processo, afim de entender relações, otimizar prazos, melhorar estratégias de desenvolvimento e diversas outras coisas.
 Assim, dado um conjunto de projetos de desenvolvimento de software, disponíveis no TravisTrorrent¹, decidimos analisar a relação entre algumas variáveis, com o objetivo de identificar possíveis relações entre a qualidade de código e projetos de diferentes linguagens. Dessa forma, surgiu a seguinte Questão de Pesquisa (QP):
 
-QP: Existe diferença significativa entre a qualidade de código de projetos de diferentes linguagens?
+**QP: Existe diferença significativa entre a qualidade de código de projetos de diferentes linguagens?**
 
 Para responder tal pergunta, utilizamos a linguagem R e o RStudio que facilitam a análise dos dados.
 
 ## Entendendo os dados
 
+A partir de uma amostra de 1270 projetos, analisaremos as seguintes variáveis:
 
-* **team:** 
-* **build_sucess_prop:**
-* **tests_per_kloc:**
-* **test_density:**
+* **lang:** representa a linguagem dominante de cada projeto, com valores "java", "ruby" e "javascript". Dados com lang = "javascript" foram desconsiderados desta análise, pois, possivelmente são erros, já que não eram objeto de coleta, segundo a descrição de quem os coletou. Os valores "ruby" são a maioria na base de dados.
+* **build_sucess_prop:** representa a proporção de builds que deram sucesso, de cada projeto. Os valores desta variável variam entre [0.0, 1.0], porém a concentração dos valores está entre [0.5, 1.0].
+* **tests_per_kloc:** representa a quantidade de testes para cada mil linhas de código. Os valores desta variável variam entre [0.0, 6192.3077], porém a concentração dos valores está entre [0.0, 815.7895].
+* **test_density:** representa a densidade de testes do projeto. Os valores desta variável variam entre [0.0, 2366.6667], sendo o valor máximo um outlier.
 
 ## Pré-processamento
 
@@ -42,68 +43,45 @@ projetos = projetos %>%
     filter(lang != "javascript")
 ```
 
-## Existe diferença significativa entre a qualidade de código de projetos de diferentes linguagens?
+## Análise: Existe diferença significativa entre a qualidade de código de projetos de diferentes linguagens?
 
 A partir dos dados disponibilizados no travis, gostaríamos de verificar qual a linguagem de programação que apresenta projetos com índices de melhor qualidade de código, como quantidade de testes, densidade e proporção de builds de sucesso. Assim, supõe-se que, pela linguagem Java ser mais popular, a qualidade de projetos desenvolvidos nesta linguagem também seja melhor.
 
-```{r}
-projetos %>% 
-    ggplot(aes(x = lang, y = tests_per_kloc, size = test_density, color = build_success_prop)) + 
-    geom_jitter(width = .3) +
-    scale_y_log10() +
-    ggtitle("Gráfico 1: Distribuição da quantidade de testes por linguagem") +
-    xlab("Linguagem") + 
-    ylab("#Testes por mil linhas de código")
-```
+### Sessão 1
 
-O Gráfico 1, acima, nos mostra que os projetos da linguagem Ruby estão concentrados na parte superior do gráfico, apresentando mais testes, por linha de código, do que os projetos da linguagem Java. Consequentemente, a densidade de testes dos projetos é maior, o que é verificável a partir do tamanho dos círculos no gráfico. Entretanto, é difícil identificar em qual linguagem os projetos possuem a maior proporção de builds de sucesso em relação a outra, porque, em ambas, a maioria dos projetos apresentam os melhores valores (azul mais claro).
-
-Assim, a partir do Gráfico 1, encontramos claramente a resposta da QP, onde os projetos da linguagem Ruby apresentam melhores indícios de qualidade de código.
+Abaixo seguem alguns gráficos que mostram a distribuição das variáveis **lang**, **tests_per_kloc**, **test_density** e **build_success_prop**, para identificar possíveis relações que ajudem a responder à QP.
 
 ```{r graph1, message=FALSE, warning=FALSE}
 projetos %>% 
-    ggplot(aes(x = tests_per_kloc, y = build_success_prop, color = lang, size = test_density)) + 
+    ggplot(aes(x = tests_per_kloc, y = build_success_prop, shape = lang, size = test_density)) + 
     geom_point() +
     scale_x_log10() +
-    ggtitle("Gráfico 1: Relação entre a quantidade de testes e a proporção de builds") +
+    ggtitle("Gráfico 1: Relação entre a quantidade de testes e as builds de sucesso") +
     xlab("#Testes por mil linhas de código") + 
     ylab("Proporção de builds de sucesso")
 ```
 
+O Gráfico 1, acima, nos dá indícios de que, os projetos na linguagem Ruby, representados por triângulos, possuem mais densidade de testes do que os projetos na linguagem Java, pois, identificamos os triângulos em destaque no gráfico, além disso, nos projetos de ambas as linguagens, a proporção de builds de sucesso é, em geral, elevada, porque estão concentrados na parte superior da visualização. Entretanto, é difícil identificar de qual linguagem os projetos possuem maior quantidade de testes ou se não há diferença.
 
-
-
+Ainda sobre as mesmas variáveis, criamos outra visualização, semelhante à anterior.
 
 ```{r graph2, message=FALSE, warning=FALSE}
 projetos %>% 
-    ggplot(aes(x = test_density, y = tests_per_kloc, color = lang, size = build_success_prop)) + 
-    geom_point() +
-    scale_x_log10() +
+    ggplot(aes(x = "", y = tests_per_kloc, shape = lang, size = test_density, color = build_success_prop)) + 
+    geom_jitter(width = .3) +
     scale_y_log10() +
-    ggtitle("Gráfico 1: Relação entre os colaboradores e o total de builds dos projetos") +
-    xlab("x") + 
-    ylab("y")
+    ggtitle("Gráfico 2: Distribuição da quantidade de testes") +
+    ylab("#Testes por mil linhas de código")
 ```
 
+O Gráfico 2, acima, confirma as mesmas respostas encontradas no Gráfico 1 e, ainda, nos dá indícios de que os projetos na linguagem Ruby, representados por triângulos, possuem mais testes.
 
-## TODO mostrar algo com barras
+Outra forma de observar a relação existente entre qualidade de código e linguagem de programação é através do gráfico de linhas que sumariza os dados e exibe a relação existente através de uma linha, que, neste caso, é crescente, mas não necessariamente linear, como exibido abaixo.
 
-```{r graph1, message=FALSE, warning=FALSE}
-projetos %>% 
-    ggplot(aes(x = build_success_prop, fill = lang)) + 
-    geom_bar(position = "dodge") +
-    #scale_x_log10() +
-    ggtitle("Gráfico 1: Relação entre os colaboradores e o total de builds dos projetos") +
-    xlab("x") + 
-    ylab("y")
-```
-
-
-```{r}
+```{r graph3, message=FALSE, warning=FALSE}
 projetos %>% 
     ggplot() + 
     stat_ecdf(aes(x = tests_per_kloc, y = build_success_prop, color = lang)) +
-    stat_ecdf(aes(x = test_density, y = build_success_prop, color = lang), linetype = "dashed") +
     scale_x_log10() +
     ggtitle("Gráfico 3: Distribuição da quantidade de testes por linguagem") +
     xlab("#Testes por linha de código") + 
@@ -111,4 +89,52 @@ projetos %>%
 
 ```
 
+O gráfico acima mostra uma relação muito forte entre a quantidade de testes por linha de código e a proporção de builds de sucesso, para ambas a linguagem e mais evidenciada para a linguagem Java. Além disso, também confirma que os projetos na linguagem Ruby têm mais testes. Entretanto, o gráfico não mostra o comportamento da variável referente à densidade dos testes.
 
+### Sessão 2
+
+Assim, nenhum dos gráficos exibidos na sessão 1 acima respondeu claramente à QP, mas, com alguns ajustes, eles foram melhorados, facilitando a interpretação, como você pode observar os resultados abaixo.
+
+```{r graph1.1, message=FALSE, warning=FALSE}
+projetos %>% 
+    ggplot(aes(x = tests_per_kloc, y = build_success_prop, color = lang, size = test_density)) + 
+    geom_point() +
+    scale_x_log10() +
+    ggtitle("Gráfico 1.1: Relação entre a quantidade de testes e as builds de sucesso") +
+    xlab("#Testes por mil linhas de código") + 
+    ylab("Proporção de builds de sucesso")
+```
+
+O Gráfico 1.1, acima, diferente do Gráfico 1, utiliza as cores ao invés de formas geométricas, para identificar as linguagens de programação e, agora, facilmente, identificamos também que os projetos da linguagem Ruby possuem mais testes, além das mesmas constatações descritas na análise do Gráfico 1. 
+
+O Gráfico 2.1, abaixo, diferente do Gráfico 2, separa os projetos de cada linguagem em posições, esquerda ou direita, ao invés de usar formas geométricas. Assim, é possível afirmar com mais clareza que os projetos na linguagem Ruby possuem mais testes, porque estão concentrados mais acima dos projetos na linguagem Java.
+
+```{r graph2.1, message=FALSE, warning=FALSE}
+projetos %>% 
+    ggplot(aes(x = lang, y = tests_per_kloc, size = test_density, color = build_success_prop)) + 
+    geom_jitter(width = .3) +
+    scale_y_log10() +
+    ggtitle("Gráfico 2.1: Distribuição da quantidade de testes por linguagem") +
+    xlab("Linguagem") + 
+    ylab("#Testes por mil linhas de código")
+```
+
+O Gráfico 3.1 abaixo, como um melhoramento do Gráfico 3, agora exibe o comportamento da densidade de teste em relação à proporção de builds de sucesso, para cada linguagem estudada. A proporção de builds de sucesso cresce tanto em relação a quantidade de testes (linha contínua) como em relação a densidade (linha tracejada), sendo a relação ainda mais forte para os projetos escritos na linguagem Java (linha rosa).
+
+```{r graph3.1, message=FALSE, warning=FALSE}
+projetos %>% 
+    ggplot() + 
+    stat_ecdf(aes(x = tests_per_kloc, y = build_success_prop, color = lang)) +
+    stat_ecdf(aes(x = test_density, y = build_success_prop, color = lang), linetype = "dashed") +
+    scale_x_log10() +
+    ggtitle("Gráfico 3.1: Relação da proporção de builds de sucesso") +
+    xlab("#Testes por linha de código") + 
+    ylab("Proporção de builds de sucesso")
+
+```
+
+## Conclusão
+
+Através da melhoria das visualizações, encontramos que o Gráfico 2.1 responde de forma mais clara à Questão de Pesquisa, ou seja, os projetos na linguagem Ruby, desta amostra de análise, apresentam maior qualidade de código. Esta qualidade foi medida através da quantidade de testes, da densidade de testes e da proporção de builds de sucesso.
+
+¹ https://travistorrent.testroots.org
