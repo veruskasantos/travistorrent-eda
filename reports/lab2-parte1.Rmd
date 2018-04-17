@@ -1,7 +1,7 @@
 ---
 title: "Analisando a qualidade de projetos de desenvolvimento de software"
 author: "Veruska Santos"
-date: "15 de abril de 2018"
+date: "16 de abril de 2018"
 output: html_document
 ---
 
@@ -50,7 +50,7 @@ projetos = projetos %>%
 
 A partir dos dados disponibilizados no travis, gostaríamos de verificar qual a linguagem de programação que apresenta projetos com índices de melhor qualidade de código, como quantidade de testes, densidade e proporção de builds de sucesso. Assim, supõe-se que, pela linguagem Java ser mais popular, a qualidade de projetos desenvolvidos nesta linguagem também seja melhor.
 
-#### Sessão 1
+#### Seção 1
 
 Abaixo seguem alguns gráficos que mostram a distribuição das variáveis **lang**, **tests_per_kloc**, **test_density** e **build_success_prop**, para identificar possíveis relações que ajudem a responder à QP.
 
@@ -74,6 +74,7 @@ projetos %>%
     geom_jitter(width = .3) +
     scale_y_log10() +
     ggtitle("Gráfico 2: Distribuição da quantidade de testes") +
+    xlab("") +
     ylab("#Testes por mil linhas de código")
 ```
 
@@ -94,9 +95,9 @@ projetos %>%
 
 ```
 
-O gráfico acima mostra uma relação crescente entre a quantidade de testes por linha de código e a densidade de testes com a proporção de builds de sucesso, para ambas a linguagem. Entretanto, é difícil comparar qual das linguagens apresenta melhores resultados.
+O gráfico acima mostra uma relação crescente entre a quantidade de testes por linha de código e a densidade de testes com a proporção de builds de sucesso, para ambas as linguagens. Entretanto, é difícil comparar qual das linguagens apresenta melhores resultados.
 
-#### Sessão 2
+#### Seção 2
 
 Assim, nenhum dos gráficos exibidos na sessão 1 acima respondeu claramente à QP, mas, com alguns ajustes, eles foram melhorados, facilitando a interpretação, como você pode observar os resultados abaixo.
 
@@ -140,6 +141,6 @@ projetos %>%
 
 ### Conclusão
 
-Através da melhoria das visualizações, encontramos que o Gráfico 2.1 responde de forma mais clara à Questão de Pesquisa, ou seja, os projetos na linguagem Ruby, desta amostra de análise, apresentam, diferente do esperado, maior qualidade de código. Esta qualidade foi medida através da quantidade de testes, da densidade de testes e da proporção de builds de sucesso.
+Através da melhoria das visualizações, encontramos que o Gráfico 2.1, da seção 2, responde de forma mais clara à Questão de Pesquisa, ou seja, os projetos na linguagem Ruby, desta amostra de análise, apresentam, diferente do esperado, maior qualidade de código. Esta qualidade foi medida através da quantidade de testes, da densidade de testes e da proporção de builds de sucesso, onde, nesta última, não apresentou diferenças significativas, mas os projetos da linguagem Ruby apresentaram resultados superiores para a quantidade de testes e a densidade de testes em relação aos projetos da linguagem Java.
 
 ¹ https://travistorrent.testroots.org
