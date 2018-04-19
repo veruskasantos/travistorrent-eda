@@ -1,0 +1,58 @@
+---
+title: "lab2-parte2"
+author: "Veruska Santos"
+date: "19 de abril de 2018"
+output: html_document
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+```{r read}
+projetos = read.csv(here::here("data/projetos.csv"))
+```
+
+```{r clean}
+projetos = projetos %>%
+    filter(lang != "javascript")
+```
+
+```{r cleanTeam}
+projetos = projetos %>%
+    filter(team >= 10)
+
+```
+
+## Ao comparar projetos em Java e em Ruby que tenham ao menos 10 contribuidores no time, nos nossos dados, projetos de qual linguagem variam mais na proporção de builds cujo resultado é sucesso?
+
++ tamanho das equipes
+
+```{r oldGraph}
+projetos %>%
+    ggplot(aes(x = "", 
+               y = build_success_prop, color = lang)) + 
+    geom_jitter(alpha = .9, width = .2, size = 2) +
+    facet_grid(lang ~ .)
+```
+
+```{r newGraph}
+projetos %>% 
+    ggplot(aes(x= lang, 
+               y = build_success_prop)) + 
+    geom_boxplot(width = .25, outlier.shape=NA) +
+    geom_jitter(aes(color = lang, size = team), alpha = .6, width = .2) +
+    labs(x = "", y = "Proporção de builds de sucesso", 
+         title = "Distribuição da proporção de builds de sucesso, por linguagem",
+         size = "Colaboradores", color = "Linguagem")
+     
+```
+
+
+
+
+
+
+
+
+
