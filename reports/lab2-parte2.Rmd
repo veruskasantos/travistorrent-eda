@@ -29,15 +29,20 @@ projetos = projetos %>%
 + tamanho das equipes
 
 ```{r oldGraph}
-projetos %>%
+grafico1 <- projetos %>%
     ggplot(aes(x = "", 
                y = build_success_prop, color = lang)) + 
     geom_jitter(alpha = .9, width = .2, size = 2) +
     facet_grid(lang ~ .)
 ```
 
+```{r}
+print(grafico1)
+ggsave("grafico1-lab2parte2.pdf", width = 6, height = 4)
+```
+
 ```{r newGraph}
-projetos %>% 
+grafico2 <- projetos %>% 
     ggplot(aes(x= lang, 
                y = build_success_prop)) + 
     geom_boxplot(width = .25, outlier.shape=NA) +
@@ -48,11 +53,10 @@ projetos %>%
      
 ```
 
-
-
-
-
-
+```{r}
+print(grafico2)
+ggsave("grafico2-lab2parte2.pdf", width = 6, height = 4)
+```
 
 
 
